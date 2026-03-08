@@ -8,7 +8,7 @@ from Code.Const import COLOR_PURPLE
 class Menu:
     def __init__(self, window):
         self.window = window
-        self.surf = pygame.image.load('./asset/backgroud 1/background 1.png')
+        self.surf = pygame.image.load('./asset/background1/background 1.png')
         self.rect = self.surf.get_rect(left=0, top=0)
 
     def run(self, menu_option=0):
