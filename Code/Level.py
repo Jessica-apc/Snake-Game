@@ -3,7 +3,8 @@ from xml.dom.minidom import Entity
 import pygame
 
 from Code.EntityFactory import EntityFactory
-from Code.Const import COLOR_WHITE , WIN_HEIGHT
+from Code.Const import COLOR_WHITE, WIN_HEIGHT, EVENT_ENEMY
+from Code.EntityMediator import EntityMediator
 
 
 class Level:
@@ -16,6 +17,7 @@ class Level:
         self.entity_list.extend(EntityFactory.get_entity('Level1Bg'))
         self.entity_list.append(EntityFactory.get_entity('Player1'))
         self.timeout = 20000 # 20 segundos
+        pygame.time.set_timer(EVENT_ENEMY, millis= 4000 )
 
     def run(self):
         pygame.mixer_music.load(f"./asset/sound/Level1.mp3")
@@ -30,6 +32,9 @@ class Level:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
+                if event.type == EVENT_ENEMY:
+                    self.entity_list.append(EntityFactory.get_entity('Enemy'))
+
 
             for ent in self.entity_list:
                 self.window.blit(source=ent.surf, dest=ent.rect)
@@ -41,6 +46,9 @@ class Level:
             self.level_text(14, f'fps: {clock.get_fps():.0f}', COLOR_WHITE, (10, WIN_HEIGHT - 35))
             self.level_text(14, f'entidades: {len(self.entity_list)}', COLOR_WHITE, (10, WIN_HEIGHT - 20))
             pygame.display.flip()
+            EntityMediator.verify_collision(entity_list=self.entity_list)
+
+
 
             # Aqui temos o tipo de formatação que o texto vai receber
     def level_text(self, text_size: int, text: str, text_color: tuple, text_pos: tuple):

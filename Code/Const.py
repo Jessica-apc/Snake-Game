@@ -1,3 +1,6 @@
+import pygame
+
+
 # C
 COLOR_PURPLE = (180, 0 , 255)
 COLOR_YELLOW = (255, 255, 0)
@@ -12,7 +15,12 @@ ENTITY_SPEED = {
     'Level1Bg4': 0.8,
     'Level1Bg5': 1,
     'Level1Bg6': 1.2,
+    'Player1': 3,
+    'Enemy': 2,
+
 }
+
+EVENT_ENEMY = pygame.USEREVENT + 1
 
 # M
 MENU_OPTION = (
@@ -26,3 +34,11 @@ MENU_OPTION = (
 # W
 WIN_WIDTH = 576
 WIN_HEIGHT = 324
+
+# P
+PLAYER_KEY_UP = {'Player1': pygame.K_UP,}
+PLAYER_KEY_DOWN = {'Player1': pygame.K_DOWN,}
+PLAYER_KEY_LEFT = {'Player1': pygame.K_LEFT,}
+PLAYER_KEY_RIGHT = {'Player1': pygame.K_RIGHT,}
+PLAYER_KEY_SHOOT = {'Player1': pygame.K_RCTRL,}
+
