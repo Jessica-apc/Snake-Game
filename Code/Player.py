@@ -13,7 +13,9 @@ class Player(Entity):
         self.rect = self.surf.get_rect(topleft=position)
 
         self.life = 3
-        self.last_shot = 0
+
+    def update(self):
+        self.move()
 
     def move(self):
 
@@ -30,12 +32,3 @@ class Player(Entity):
 
         if pressed_key[PLAYER_KEY_RIGHT[self.name]] and self.rect.right < WIN_WIDTH:
             self.rect.x += ENTITY_SPEED[self.name]
-
-        # verificar se quer atirar
-        if pressed_key[pygame.K_SPACE]:
-
-            now = pygame.time.get_ticks()
-
-            if now - self.last_shot > 400:
-                self.last_shot = now
-                return "SHOT"
