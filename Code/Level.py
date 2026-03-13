@@ -13,13 +13,18 @@ class Level:
         self.window = window
         self.name = name
         self.game_mode = game_mode
+        self.timeout = timeout
 
         self.entity_list: list[Entity] = []
 
+        # fundo
         self.entity_list.extend(EntityFactory.get_entity('Level1Bg'))
+
+        # player
         self.entity_list.append(EntityFactory.get_entity('Player1'))
 
-        self.timeout = 20000  # 20 segundos
+        # controle de tiro
+        self.last_shot_time = 0
 
         pygame.time.set_timer(EVENT_ENEMY, 4000)
 
@@ -40,46 +45,100 @@ class Level:
                     pygame.quit()
                     exit()
 
+                # spawn inimigo
                 if event.type == EVENT_ENEMY:
                     self.entity_list.append(EntityFactory.get_entity('Enemy'))
+
+                # disparo do tiro
+                if event.type == pygame.KEYDOWN:
+
+                    if event.key == pygame.K_SPACE:
+
+                        now = pygame.time.get_ticks()
+
+                        # cooldown de tiro
+                        if now - self.last_shot_time > 400:
+
+                            self.last_shot_time = now
+
+                            for ent in self.entity_list:
+
+                                if ent.name == "Player1":
+
+                                    self.entity_list.append(
+                                        EntityFactory.get_entity(
+                                            "PlayerShot",
+                                            (ent.rect.right, ent.rect.centery)
+                                        )
+                                    )
 
             # mover e desenhar entidades
             for ent in self.entity_list:
 
                 self.window.blit(ent.surf, ent.rect)
 
-                result = ent.move()
-
-                # criar tiro
-                if result == "SHOT":
-
-                    self.entity_list.append(
-                        EntityFactory.get_entity(
-                            "PlayerShot",
-                            (ent.rect.right, ent.rect.centery)
-                        )
-                    )
+                ent.move()
 
             # verificar colisões
             EntityMediator.verify_collision(self.entity_list)
 
-            # textos na tela
-            self.level_text(14, f'{self.name} - Timeout: {self.timeout / 1000:.1f}s', COLOR_WHITE, (10, 5))
-            self.level_text(14, f'fps: {clock.get_fps():.0f}', COLOR_WHITE, (10, WIN_HEIGHT - 35))
-            self.level_text(14, f'entidades: {len(self.entity_list)}', COLOR_WHITE, (10, WIN_HEIGHT - 20))
+            # verificar vida do player
+            for ent in self.entity_list:
+
+                if ent.name == "Player1":
+
+                    if ent.life <= 0:
+
+                        print("GAME OVER")
+
+                        pygame.quit()
+                        exit()
+
+            # textos do jogo
+            self.level_text(
+                14,
+                f'{self.name} - Timeout: {self.timeout / 1000:.1f}s',
+                COLOR_WHITE,
+                (10, 5)
+            )
+
+            self.level_text(
+                14,
+                f'fps: {clock.get_fps():.0f}',
+                COLOR_WHITE,
+                (10, WIN_HEIGHT - 35)
+            )
+
+            self.level_text(
+                14,
+                f'entidades: {len(self.entity_list)}',
+                COLOR_WHITE,
+                (10, WIN_HEIGHT - 20)
+            )
 
             # mostrar vida do player
             for ent in self.entity_list:
+
                 if ent.name == "Player1":
-                    self.level_text(14, f'Vida: {ent.life}', COLOR_WHITE, (10, 25))
+
+                    self.level_text(
+                        14,
+                        f'Vida: {ent.life}',
+                        COLOR_WHITE,
+                        (10, 25)
+                    )
 
             pygame.display.flip()
 
     def level_text(self, text_size: int, text: str, text_color: tuple, text_pos: tuple):
 
         text_font = pygame.font.SysFont("Lucida Sans Typewriter", text_size)
+
         text_surf = text_font.render(text, True, text_color).convert_alpha()
-        text_rect = text_surf.get_rect(left=text_pos[0], top=text_pos[1])
+
+        text_rect = text_surf.get_rect(
+            left=text_pos[0],
+            top=text_pos[1]
+        )
 
         self.window.blit(text_surf, text_rect)
-
