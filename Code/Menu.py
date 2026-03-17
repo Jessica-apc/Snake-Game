@@ -1,8 +1,7 @@
 import pygame
 import pygame.image
 
-from Code.Const import WIN_WIDTH, MENU_OPTION, COLOR_YELLOW
-from Code.Const import COLOR_PURPLE
+from Code.Const import WIN_WIDTH, MENU_OPTION, COLOR_YELLOW, COLOR_PURPLE
 
 
 class Menu:
@@ -16,71 +15,60 @@ class Menu:
         pygame.mixer.music.play(-1)
 
         while True:
-            # Mostra o fundo
-            self.window.blit(source=self.surf, dest=self.rect)
+            # Fundo
+            self.window.blit(self.surf, self.rect)
 
-            # Título
-            self.menu_text(
-                text_size=50,
-                text="JOGO",
-                text_color=COLOR_PURPLE,
-                text_center_pos=(WIN_WIDTH / 2, 70)
-            )
+            #  TÍTULO
+            self.menu_text_center(45, "JOGO", COLOR_PURPLE, (WIN_WIDTH / 2, 70))
+            self.menu_text_center(45, "DA COBRA", COLOR_PURPLE, (WIN_WIDTH / 2, 120))
 
-            self.menu_text(
-                text_size=50,
-                text="DA "
-                     "COBRA",
-                text_color=COLOR_PURPLE,
-                text_center_pos=(WIN_WIDTH / 2, 120)
-            )
-
-            # Opções do menu
+            #  OPÇÕES
             for i in range(len(MENU_OPTION)):
-                if i == menu_option:
-                    self.menu_text(
-                        text_size=20,
-                        text=MENU_OPTION[i],
-                        text_color=COLOR_PURPLE,
-                        text_center_pos=(WIN_WIDTH / 2, 200 + 25 * i)
-                    )
-                else:
-                    self.menu_text(
-                         text_size=20,
-                         text=MENU_OPTION[i],
-                         text_color=COLOR_YELLOW,
-                         text_center_pos=(WIN_WIDTH / 2, 200 + 25 * i)
+                color = COLOR_PURPLE if i == menu_option else COLOR_YELLOW
+
+                self.menu_text_center(
+                    25,
+                    MENU_OPTION[i],
+                    color,
+                    (WIN_WIDTH / 2, 200 + 40 * i)
                 )
 
-            # Loop de eventos
+            #  CONTROLES
+            x_pos = WIN_WIDTH - 180
+
+            self.menu_text_left(16, "CONTROLES", COLOR_YELLOW, (x_pos, 180))
+            self.menu_text_left(14, "SETAS - mover", COLOR_YELLOW, (x_pos, 210))
+            self.menu_text_left(14, "ESPAÇO - atirar", COLOR_YELLOW, (x_pos, 230))
+            self.menu_text_left(14, "ENTER - selecionar", COLOR_YELLOW, (x_pos, 250))
+
+            #  EVENTOS
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
-                if event.type == pygame.KEYDOWN: # Quando se usa a tecla para baixo
+
+                if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
-                         if menu_option < len(MENU_OPTION) - 1:
-                             menu_option += 1
-                         else:
-                             menu_option = 0
-                    if event.key == pygame.K_UP:  # UP KEY
-                        if menu_option > 0:
-                            menu_option -= 1
-                        else:
-                            menu_option = len(MENU_OPTION) - 1
-                    if event.key == pygame.K_RETURN:  # ENTER
+                        menu_option = (menu_option + 1) % len(MENU_OPTION)
+
+                    if event.key == pygame.K_UP:
+                        menu_option = (menu_option - 1) % len(MENU_OPTION)
+
+                    if event.key == pygame.K_RETURN:
                         return MENU_OPTION[menu_option]
 
-            # Atualiza a tela
             pygame.display.flip()
 
-    def menu_text(self, text_size: int, text: str, text_color: tuple, text_center_pos: tuple):
-        text_font = pygame.font.SysFont(
-            name="Lucida Sans Typewriter",
-            size=text_size
-        )
+    # TITULO E OPÇÕES
+    def menu_text_center(self, size, text, color, pos):
+        font = pygame.font.SysFont("Lucida Sans Typewriter", size)
+        surf = font.render(text, True, color).convert_alpha()
+        rect = surf.get_rect(center=pos)
+        self.window.blit(surf, rect)
 
-        text_surf = text_font.render(text, True, text_color).convert_alpha()
-        text_rect = text_surf.get_rect(center=text_center_pos)
-
-        self.window.blit(source=text_surf, dest=text_rect)
+    # TEXTO LATERAL (CONTROLES)
+    def menu_text_left(self, size, text, color, pos):
+        font = pygame.font.SysFont("Lucida Sans Typewriter", size)
+        surf = font.render(text, True, color).convert_alpha()
+        rect = surf.get_rect(midleft=pos)
+        self.window.blit(surf, rect)

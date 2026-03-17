@@ -8,21 +8,28 @@ from Code.Level import Level
 class Game:
     def __init__(self):
         pygame.init()
-        self.window = pygame.display.set_mode(size=(WIN_WIDTH, WIN_HEIGHT))
+        self.window = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+        pygame.display.set_caption("Jogo da Cobra")
 
     def run(self):
 
         while True:
+
+            # MENU
             menu = Menu(self.window)
             menu_return = menu.run()
 
-            if menu_return in [MENU_OPTION[0], MENU_OPTION[1], MENU_OPTION[2]]:
+            #  JOGAR
+            if menu_return == MENU_OPTION[0]:
+
                 level = Level(self.window, 'Level1', menu_return, 60000)
                 level_return = level.run()
 
-            elif menu_return == MENU_OPTION[4]:
+                # voltou do level (ex: morreu)
+                if level_return == "menu":
+                    continue
+
+            #  SAIR
+            elif menu_return == MENU_OPTION[1]:
                 pygame.quit()
                 quit()
-
-            else:
-                pass

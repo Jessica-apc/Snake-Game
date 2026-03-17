@@ -5,29 +5,41 @@ class EntityMediator:
 
         remove_list = []
 
-        for ent1 in entity_list:
-            for ent2 in entity_list:
+        for i in range(len(entity_list)):
+            ent1 = entity_list[i]
 
-                if ent1 == ent2:
-                    continue
+            for j in range(i + 1, len(entity_list)):
+                ent2 = entity_list[j]
 
-                # player vs enemy
+                #  PLAYER vs ENEMY
                 if ent1.name == "Player1" and ent2.name == "Enemy":
 
                     if ent1.rect.colliderect(ent2.rect):
-
                         ent1.life -= 1
                         remove_list.append(ent2)
 
-                # tiro vs enemy
+                elif ent2.name == "Player1" and ent1.name == "Enemy":
+
+                    if ent1.rect.colliderect(ent2.rect):
+                        ent2.life -= 1
+                        remove_list.append(ent1)
+
+                #  TIRO vs ENEMY
                 if ent1.name == "PlayerShot" and ent2.name == "Enemy":
 
                     if ent1.rect.colliderect(ent2.rect):
-
                         remove_list.append(ent1)
                         remove_list.append(ent2)
 
-        for ent in remove_list:
+                elif ent2.name == "PlayerShot" and ent1.name == "Enemy":
 
+                    if ent1.rect.colliderect(ent2.rect):
+                        remove_list.append(ent1)
+                        remove_list.append(ent2)
+
+        # remove duplicados
+        remove_list = list(set(remove_list))
+
+        for ent in remove_list:
             if ent in entity_list:
                 entity_list.remove(ent)

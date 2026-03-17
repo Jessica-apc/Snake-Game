@@ -1,8 +1,7 @@
 import pygame
 from Code.Entity import Entity
-
 from Code.EntityFactory import EntityFactory
-from Code.Const import COLOR_WHITE, WIN_HEIGHT, EVENT_ENEMY
+from Code.Const import COLOR_WHITE, WIN_HEIGHT, WIN_WIDTH, EVENT_ENEMY
 from Code.EntityMediator import EntityMediator
 
 
@@ -30,8 +29,8 @@ class Level:
 
     def run(self):
 
-        pygame.mixer_music.load("./asset/sound/Level1.mp3")
-        pygame.mixer_music.play(-1)
+        pygame.mixer.music.load("./asset/sound/Level1.mp3")
+        pygame.mixer.music.play(-1)
 
         clock = pygame.time.Clock()
 
@@ -39,6 +38,7 @@ class Level:
 
             clock.tick(60)
 
+            #  EVENTOS
             for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:
@@ -49,52 +49,58 @@ class Level:
                 if event.type == EVENT_ENEMY:
                     self.entity_list.append(EntityFactory.get_entity('Enemy'))
 
-                # disparo do tiro
-                if event.type == pygame.KEYDOWN:
+                # tiro
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
 
-                    if event.key == pygame.K_SPACE:
+                    now = pygame.time.get_ticks()
 
-                        now = pygame.time.get_ticks()
+                    if now - self.last_shot_time > 400:
+                        self.last_shot_time = now
 
-                        # cooldown de tiro
-                        if now - self.last_shot_time > 400:
-
-                            self.last_shot_time = now
-
-                            for ent in self.entity_list:
-
-                                if ent.name == "Player1":
-
-                                    self.entity_list.append(
-                                        EntityFactory.get_entity(
-                                            "PlayerShot",
-                                            (ent.rect.right, ent.rect.centery)
-                                        )
+                        for ent in self.entity_list:
+                            if ent.name == "Player1":
+                                self.entity_list.append(
+                                    EntityFactory.get_entity(
+                                        "PlayerShot",
+                                        (ent.rect.right, ent.rect.centery)
                                     )
+                                )
 
-            # mover e desenhar entidades
-            for ent in self.entity_list:
-
+            #  ATUALIZAÇÃO
+            for ent in self.entity_list[:]:  # cópia da lista
                 self.window.blit(ent.surf, ent.rect)
-
                 ent.move()
 
-            # verificar colisões
+            # colisões
             EntityMediator.verify_collision(self.entity_list)
 
-            # verificar vida do player
+            # ---------------- PLAYER ----------------
+            player = None
             for ent in self.entity_list:
-
                 if ent.name == "Player1":
+                    player = ent
+                    break
 
-                    if ent.life <= 0:
+            if player:
+                # vida
+                self.level_text(14, f'Vida: {player.life}', COLOR_WHITE, (10, 25))
 
-                        print("GAME OVER")
+                # morreu
+                if player.life <= 0:
 
-                        pygame.quit()
-                        exit()
+                    self.level_text(
+                        40,
+                        "GAME OVER",
+                        COLOR_WHITE,
+                        (WIN_WIDTH / 2 - 120, WIN_HEIGHT / 2)
+                    )
 
-            # textos do jogo
+                    pygame.display.flip()
+                    pygame.time.delay(2000)
+
+                    return "menu"
+
+            #  HUD
             self.level_text(
                 14,
                 f'{self.name} - Timeout: {self.timeout / 1000:.1f}s',
@@ -115,18 +121,6 @@ class Level:
                 COLOR_WHITE,
                 (10, WIN_HEIGHT - 20)
             )
-
-            # mostrar vida do player
-            for ent in self.entity_list:
-
-                if ent.name == "Player1":
-
-                    self.level_text(
-                        14,
-                        f'Vida: {ent.life}',
-                        COLOR_WHITE,
-                        (10, 25)
-                    )
 
             pygame.display.flip()
 
