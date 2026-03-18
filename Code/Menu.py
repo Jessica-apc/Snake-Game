@@ -2,7 +2,7 @@ import pygame
 import pygame.image
 
 from Code.Const import WIN_WIDTH, MENU_OPTION, COLOR_YELLOW, COLOR_PURPLE
-
+import sys
 
 class Menu:
     def __init__(self, window):
@@ -45,8 +45,7 @@ class Menu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    quit()
-
+                    sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
                         menu_option = (menu_option + 1) % len(MENU_OPTION)
