@@ -3,6 +3,7 @@ from Code.Entity import Entity
 from Code.EntityFactory import EntityFactory
 from Code.Const import COLOR_WHITE, WIN_HEIGHT, WIN_WIDTH, EVENT_ENEMY
 from Code.EntityMediator import EntityMediator
+import sys
 
 
 class Level:
@@ -43,7 +44,7 @@ class Level:
 
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    sys.exit()
 
                 # spawn inimigo
                 if event.type == EVENT_ENEMY:
