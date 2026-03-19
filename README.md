@@ -1,4 +1,4 @@
-# 🐍 Snake Game (Pygame)
+# 🐍 Jogo da Cobra (Pygame)
 
 Um jogo estilo arcade desenvolvido em Python utilizando a biblioteca Pygame.
 O objetivo é controlar a cobra/nave, desviar dos inimigos e sobreviver o máximo possível.
