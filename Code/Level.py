@@ -1,9 +1,9 @@
 import pygame
+import sys
 from Code.Entity import Entity
 from Code.EntityFactory import EntityFactory
 from Code.Const import COLOR_WHITE, WIN_HEIGHT, WIN_WIDTH, EVENT_ENEMY
 from Code.EntityMediator import EntityMediator
-import sys
 
 
 class Level:
@@ -46,36 +46,45 @@ class Level:
                     pygame.quit()
                     sys.exit()
 
-                # spawn inimigo
                 if event.type == EVENT_ENEMY:
                     self.entity_list.append(EntityFactory.get_entity('Enemy'))
 
-                # tiro
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            #  TIRO
+            keys = pygame.key.get_pressed()
 
-                    now = pygame.time.get_ticks()
+            if keys[pygame.K_SPACE]:
 
-                    if now - self.last_shot_time > 400:
-                        self.last_shot_time = now
+                now = pygame.time.get_ticks()
 
-                        for ent in self.entity_list:
-                            if ent.name == "Player1":
-                                self.entity_list.append(
-                                    EntityFactory.get_entity(
-                                        "PlayerShot",
-                                        (ent.rect.right, ent.rect.centery)
-                                    )
+                if now - self.last_shot_time > 400:
+
+                    self.last_shot_time = now
+
+                    for ent in self.entity_list:
+                        if ent.name == "Player1":
+
+                            self.entity_list.append(
+                                EntityFactory.get_entity(
+                                    "PlayerShot",
+                                    (ent.rect.right, ent.rect.centery)
                                 )
+                            )
 
             #  ATUALIZAÇÃO
-            for ent in self.entity_list[:]:  # cópia da lista
+            for ent in self.entity_list[:]:
                 self.window.blit(ent.surf, ent.rect)
                 ent.move()
+
+            # 🔥 REMOVER TIROS FORA DA TELA
+            self.entity_list = [
+                ent for ent in self.entity_list
+                if not (ent.name == "PlayerShot" and ent.rect.left > WIN_WIDTH)
+            ]
 
             # colisões
             EntityMediator.verify_collision(self.entity_list)
 
-            # ---------------- PLAYER ----------------
+            #  PLAYER
             player = None
             for ent in self.entity_list:
                 if ent.name == "Player1":
@@ -83,10 +92,8 @@ class Level:
                     break
 
             if player:
-                # vida
                 self.level_text(14, f'Vida: {player.life}', COLOR_WHITE, (10, 25))
 
-                # morreu
                 if player.life <= 0:
 
                     self.level_text(
